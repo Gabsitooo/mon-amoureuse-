@@ -465,6 +465,159 @@
       .photo-inner{ width:110px; height:110px; }
       .landing-inner{ gap:18px; }
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       LETTER SCREEN — Cinematic love letter
+    ══════════════════════════════════════════════════════════════ */
+    #letter-screen {
+      background:#020202;
+      flex-direction:column;
+      overflow-y:auto; align-items:flex-start;
+      transition:opacity 2s cubic-bezier(.4,0,.2,1);
+      padding:0;
+    }
+
+    /* Cinematic vignette */
+    #letter-vignette {
+      position:fixed; inset:0; z-index:1; pointer-events:none;
+      background:radial-gradient(ellipse 72% 70% at 50% 50%, transparent 25%, rgba(0,0,0,.72) 100%);
+    }
+
+    /* Warm centre pulse */
+    #letter-glow {
+      position:fixed; inset:0; z-index:1; pointer-events:none;
+      background:radial-gradient(ellipse 48% 55% at 50% 50%, rgba(196,25,59,.045) 0%, transparent 65%);
+      animation:lgPulse 5s ease-in-out infinite;
+    }
+    @keyframes lgPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+    #letter-content {
+      position:relative; z-index:2;
+      width:100%; max-width:700px; margin:0 auto;
+      padding:clamp(55px,12vh,110px) clamp(22px,6vw,60px) clamp(70px,12vh,130px);
+      display:flex; flex-direction:column; align-items:center;
+      text-align:center;
+    }
+
+    .letter-block {
+      width:100%; opacity:0; transform:translateY(18px);
+      transition:opacity 2s ease, transform 2s ease;
+      margin-bottom:clamp(22px,4.5vh,44px);
+    }
+    .letter-block.show { opacity:1; transform:translateY(0); }
+
+    .lb-title {
+      font-family:'Dancing Script',cursive;
+      font-size:clamp(2.2rem,6vw,3.4rem);
+      color:var(--gold);
+      text-shadow:0 0 32px var(--gold-glow), 0 0 64px rgba(212,175,55,.18);
+      line-height:1.35;
+    }
+
+    .lb-para {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(.95rem,2.4vw,1.22rem);
+      font-style:italic; line-height:2.05;
+      color:rgba(242,237,230,.82);
+    }
+
+    .lb-love {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2rem,5vw,3rem);
+      font-style:italic; color:var(--red);
+      text-shadow:0 0 32px var(--red-glow), 0 0 64px rgba(196,25,59,.2);
+    }
+
+    .lb-sig {
+      font-family:'Dancing Script',cursive;
+      font-size:clamp(2rem,5.5vw,3rem);
+      color:var(--gold);
+      text-shadow:0 0 24px var(--gold-glow);
+      line-height:1.45;
+    }
+
+    .lb-sep {
+      width:38px; height:1px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
+      margin:0 auto clamp(20px,4.5vh,44px); opacity:0;
+      transition:opacity 2s ease;
+    }
+    .lb-sep.show { opacity:.38; }
+
+    /* Photo block */
+    #letter-photo-wrap {
+      opacity:0; transform:scale(.92);
+      transition:opacity 2.2s ease, transform 2.2s ease;
+      display:flex; flex-direction:column; align-items:center; gap:22px;
+      margin-bottom:clamp(22px,4vh,40px);
+    }
+    #letter-photo-wrap.show { opacity:1; transform:scale(1); }
+
+    .lp-frame {
+      position:relative; width:190px; height:190px;
+    }
+    .lp-ring {
+      position:absolute; inset:-10px; border-radius:50%;
+      border:2px solid var(--gold);
+      box-shadow:0 0 44px var(--gold-glow), 0 0 88px rgba(212,175,55,.18);
+      animation:lrGlow 3.5s ease-in-out infinite;
+    }
+    .lp-ring::before {
+      content:''; position:absolute; top:-4px; left:50%; transform:translateX(-50%);
+      width:10px; height:10px; border-radius:50%;
+      background:var(--gold); box-shadow:0 0 10px var(--gold);
+      animation:lrGlow 3.5s ease-in-out infinite;
+    }
+    @keyframes lrGlow {
+      0%,100%{ box-shadow:0 0 44px var(--gold-glow), 0 0 88px rgba(212,175,55,.18); }
+      50%{ box-shadow:0 0 70px rgba(212,175,55,.65), 0 0 130px rgba(212,175,55,.28); }
+    }
+    .lp-inner {
+      width:190px; height:190px; border-radius:50%; overflow:hidden;
+      position:relative; z-index:1;
+      background:linear-gradient(135deg,#1a1014,#2a1520);
+      display:flex; align-items:center; justify-content:center;
+      font-size:76px;
+      box-shadow:0 0 40px rgba(0,0,0,.9);
+    }
+
+    /* "Pour toujours" finale */
+    #letter-finale {
+      opacity:0; transform:translateY(14px) scale(.97);
+      transition:opacity 2.8s ease, transform 2.8s ease;
+      margin-bottom:clamp(30px,6vh,60px);
+    }
+    #letter-finale.show { opacity:1; transform:translateY(0) scale(1); }
+    .lf-text {
+      font-family:'Dancing Script',cursive;
+      font-size:clamp(1.9rem,5.5vw,3rem);
+      color:var(--white);
+      text-shadow:0 0 24px rgba(255,255,255,.28), 0 0 48px var(--red-glow);
+    }
+
+    /* Letter replay button */
+    #letter-replay-wrap {
+      opacity:0; transition:opacity 2s ease;
+      margin-bottom:20px;
+    }
+    #letter-replay-wrap.show { opacity:1; }
+
+    /* Letter mute button — fixed bottom-right */
+    #letter-mute {
+      position:fixed; bottom:22px; right:22px; z-index:300;
+      width:40px; height:40px; border-radius:50%;
+      border:1px solid rgba(212,175,55,.22);
+      background:rgba(0,0,0,.45);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      cursor:pointer; display:none; align-items:center; justify-content:center;
+      font-size:16px; color:rgba(212,175,55,.55);
+      transition:all .3s ease;
+    }
+    #letter-mute.visible { display:flex; }
+    #letter-mute:hover {
+      border-color:var(--gold); color:var(--gold);
+      background:rgba(212,175,55,.1);
+    }
   </style>
 </head>
 <body>
@@ -550,8 +703,40 @@
     </div>
     <p class="res-msg" id="res-msg"></p>
     <button class="btn" onclick="restartGame()" style="margin-top:8px">↩ &nbsp; Rejouer</button>
+    <button class="btn" id="letter-btn" onclick="hideScreen('result-screen', showLetter)" style="margin-top:4px;background:linear-gradient(135deg,#6a0a1a,#3a0610);border-color:rgba(212,175,55,.45);font-size:.78rem;">💌 &nbsp; Voir ta lettre d'amour</button>
   </div>
 </div>
+
+<!-- ══════════════ LETTER ══════════════ -->
+<div class="screen" id="letter-screen">
+  <div id="letter-vignette"></div>
+  <div id="letter-glow"></div>
+
+  <div id="letter-content">
+    <div id="letter-lines"></div>
+
+    <!--
+      PHOTO LETTRE : remplace l'emoji par :
+      <img src="photo.jpg" alt="" style="width:100%;height:100%;object-fit:cover">
+    -->
+    <div id="letter-photo-wrap">
+      <div class="lp-frame">
+        <div class="lp-ring"></div>
+        <div class="lp-inner">💕</div>
+      </div>
+    </div>
+
+    <div id="letter-finale">
+      <div class="lf-text">Pour toujours, toi et moi ❤️</div>
+    </div>
+
+    <div id="letter-replay-wrap">
+      <button class="btn" onclick="restartGame()" style="font-size:.78rem;background:linear-gradient(135deg,#6a0a1a,#3a0610);border-color:rgba(212,175,55,.45);">↩ &nbsp; Rejouer</button>
+    </div>
+  </div>
+</div>
+
+<button id="letter-mute" onclick="toggleLetterMusic()" title="Couper la musique">🔊</button>
 
 
 <script>
@@ -1030,12 +1215,286 @@ function launchConfetti() {
 }
 
 function restartGame() {
-  hideScreen('result-screen', () => {
+  stopLetterMusic();
+  clearInterval(letterHeartsIv);
+  document.getElementById('letter-mute').classList.remove('visible');
+  const src = document.querySelector('.screen.active');
+  const sid = src ? src.id : 'result-screen';
+  hideScreen(sid, () => {
     document.querySelectorAll('.hf,.hb,.conf').forEach(e => e.remove());
     cQ = 0; score = 0;
     document.getElementById('prog-fill').style.width = '0%';
+    // reset letter screen
+    document.getElementById('letter-lines').innerHTML = '';
+    document.getElementById('letter-photo-wrap').classList.remove('show');
+    document.getElementById('letter-finale').classList.remove('show');
+    document.getElementById('letter-replay-wrap').classList.remove('show');
     showScreen('landing');
   });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LETTER SCREEN
+═══════════════════════════════════════════════════════════ */
+let letterNodes = [], letterMasterGain = null, letterMuted = false, letterHeartsIv = null;
+
+const LETTER_BLOCKS = [
+  { type:'title', text:'Joyeux huit mois,\nmon amour.' },
+  { type:'para',  text:"J'espère que tu es contente de tes chaussures\net qu'elles sont parfaitement moelleuses\npour tes petits petons." },
+  { type:'para',  text:"Je voulais juste te dire à quel point je t'aime.\nJ'espère que tu as quand même bien aimé le questionnaire.\nJ'ai essayé de le coder, bon… des fois ça buggait un peu,\ndonc j'ai fait en sorte que ça ne bug plus.\nJ'espère que maintenant tout marche bien." },
+  { type:'para',  text:"Je t'aime.\nTu es la meilleure chose qui me soit arrivée.\nJe suis tellement pressé de partir en Albanie avec toi\net de vivre encore plein de choses à tes côtés\ntellement je t'aime." },
+  { type:'para',  text:"Tu es la femme de ma vie.\nJe veux que tu arrêtes d'en douter\net que tu me fasses confiance,\nparce que le plus important pour moi, c'est nous,\net je veux que ça continue comme ça\njusqu'à la fin de nos jours." },
+  { type:'love',  text:"Je t'aime." },
+  { type:'sig',   text:'Ton amoureux,\nGabriel ❤️' },
+];
+
+// Cumulative show time in ms for each block
+const BDEL = [1600, 5800, 10800, 17200, 24000, 31000, 35500];
+const PHOTO_DEL  = 40000;
+const FINALE_DEL = 45500;
+const REPLAY_DEL = 50000;
+
+function showLetter() {
+  stopAmbient();
+  document.querySelectorAll('.hf,.conf').forEach(e => e.remove());
+
+  showScreen('letter-screen');
+  startLetterMusic();
+
+  const muteBtn = document.getElementById('letter-mute');
+  muteBtn.classList.add('visible');
+  muteBtn.textContent = '🔊';
+  muteBtn.style.color = '';
+  letterMuted = false;
+
+  // Build blocks
+  const container = document.getElementById('letter-lines');
+  container.innerHTML = '';
+
+  LETTER_BLOCKS.forEach((block, i) => {
+    const el = document.createElement('div');
+    el.className = 'letter-block';
+    const inner = block.text.replace(/\n/g, '<br>');
+    if (block.type === 'title') el.innerHTML = `<div class="lb-title">${inner}</div>`;
+    else if (block.type === 'para') el.innerHTML = `<div class="lb-para">${inner}</div>`;
+    else if (block.type === 'love') el.innerHTML = `<div class="lb-love">${inner}</div>`;
+    else el.innerHTML = `<div class="lb-sig">${inner}</div>`;
+    container.appendChild(el);
+
+    // Separator between paragraphs (not after last two)
+    if (i < LETTER_BLOCKS.length - 2) {
+      const sep = document.createElement('div');
+      sep.className = 'lb-sep';
+      container.appendChild(sep);
+      setTimeout(() => sep.classList.add('show'), BDEL[i] + 600);
+    }
+
+    setTimeout(() => {
+      el.classList.add('show');
+      setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'nearest' }), 300);
+    }, BDEL[i]);
+  });
+
+  const photoWrap = document.getElementById('letter-photo-wrap');
+  const finale    = document.getElementById('letter-finale');
+  const replay    = document.getElementById('letter-replay-wrap');
+  photoWrap.classList.remove('show');
+  finale.classList.remove('show');
+  replay.classList.remove('show');
+
+  setTimeout(() => {
+    photoWrap.classList.add('show');
+    setTimeout(() => photoWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }), 300);
+    // extra heart burst around photo reveal
+    for (let i = 0; i < 20; i++) setTimeout(spawnHF, Math.random() * 2500);
+  }, PHOTO_DEL);
+
+  setTimeout(() => {
+    finale.classList.add('show');
+    setTimeout(() => finale.scrollIntoView({ behavior:'smooth', block:'nearest' }), 300);
+    for (let i = 0; i < 35; i++) setTimeout(spawnHF, Math.random() * 4000);
+  }, FINALE_DEL);
+
+  setTimeout(() => {
+    replay.classList.add('show');
+  }, REPLAY_DEL);
+
+  // Continuous slow heart drift throughout
+  let hCount = 0;
+  clearInterval(letterHeartsIv);
+  letterHeartsIv = setInterval(() => {
+    if (hCount > 300) { clearInterval(letterHeartsIv); return; }
+    spawnHF(); hCount++;
+  }, 700);
+}
+
+/* ─── Letter piano music ─────────────────────────────── */
+function startLetterMusic() {
+  initAudio();
+  stopLetterMusic();
+
+  letterMasterGain = audioCtx.createGain();
+  letterMasterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+  letterMasterGain.gain.linearRampToValueAtTime(.06, audioCtx.currentTime + 10); // slow gentle rise
+  letterMasterGain.connect(audioCtx.destination);
+
+  schedulePiano();
+}
+
+function stopLetterMusic() {
+  if (letterMasterGain) {
+    try {
+      letterMasterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 2);
+    } catch(e) {}
+    setTimeout(() => {
+      letterNodes.forEach(n => { try{n.stop&&n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
+      letterNodes = [];
+      try { letterMasterGain && letterMasterGain.disconnect(); } catch(e) {}
+      letterMasterGain = null;
+    }, 2500);
+  }
+}
+
+function toggleLetterMusic() {
+  initAudio();
+  const btn = document.getElementById('letter-mute');
+  letterMuted = !letterMuted;
+  if (letterMuted) {
+    if (letterMasterGain) letterMasterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + .6);
+    btn.textContent = '🔇';
+    btn.style.color = 'rgba(255,255,255,.35)';
+  } else {
+    if (letterMasterGain) letterMasterGain.gain.linearRampToValueAtTime(.06, audioCtx.currentTime + 1.2);
+    btn.textContent = '🔊';
+    btn.style.color = '';
+  }
+}
+
+function lPianoNote(freq, t, dur, amp) {
+  if (!letterMasterGain) return;
+  // triangle fundamental + sine harmonics → soft piano timbre
+  [[freq,.5,'triangle'],[freq*2,.28,'sine'],[freq*4,.07,'sine']].forEach(([f,rel,type]) => {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = f;
+    o.connect(g); g.connect(letterMasterGain);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(amp * rel, t + .013);
+    g.gain.exponentialRampToValueAtTime(amp * rel * .38, t + .09);
+    g.gain.exponentialRampToValueAtTime(amp * rel * .18, t + dur * .55);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.start(t); o.stop(t + dur + .06);
+    letterNodes.push(o, g);
+  });
+}
+
+function lPad(freq, t, dur, amp) {
+  if (!letterMasterGain) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine'; o.frequency.value = freq;
+  o.connect(g); g.connect(letterMasterGain);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(amp, t + 2);
+  g.gain.linearRampToValueAtTime(amp, t + dur - 2);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  o.start(t); o.stop(t + dur + .1);
+  letterNodes.push(o, g);
+}
+
+function schedulePiano() {
+  const now = audioCtx.currentTime;
+  const Q = 1.0; // quarter note @ 60 BPM
+  const H = 2.0, W = 4.0;
+
+  // "You Are Not Alone" inspired melody — Bb major, 60 BPM
+  // Bb3=233.08 C4=261.63 D4=293.66 Eb4=311.13 F4=349.23 G4=392 Ab4=415.3 Bb4=466.16 C5=523.25 D5=587.33 F5=698.46
+  const F4=349.23, Eb4=311.13, D4=293.66, Bb3=233.08, G4=392.00, Ab4=415.30,
+        Bb4=466.16, C5=523.25, D5=587.33, C4=261.63, F5=698.46, Eb5=622.25;
+
+  const mel = [
+    // Verse 1 feel
+    [F4,   0*Q, H,   .13],
+    [Eb4,  2*Q, Q,   .11],
+    [D4,   3*Q, Q,   .11],
+    [Bb3,  4*Q, H+Q, .14],
+    // Phrase 2
+    [F4,   7*Q, Q,   .12],
+    [G4,   8*Q, Q,   .12],
+    [F4,   9*Q, Q,   .11],
+    [Eb4, 10*Q, Q,   .11],
+    [D4,  11*Q, H,   .13],
+    [C4,  13*Q, Q,   .10],
+    [Bb3, 14*Q, H,   .12],
+    // Phrase 3 rise
+    [D4,  16*Q, Q,   .11],
+    [Eb4, 17*Q, Q,   .11],
+    [F4,  18*Q, Q,   .12],
+    [G4,  19*Q, Q,   .13],
+    [Bb4, 20*Q, H,   .15],
+    [Ab4, 22*Q, Q,   .12],
+    [G4,  23*Q, Q,   .11],
+    // Phrase 4 resolution
+    [F4,  24*Q, Q,   .11],
+    [Eb4, 25*Q, Q,   .11],
+    [D4,  26*Q, Q,   .10],
+    [C4,  27*Q, Q,   .10],
+    [Bb3, 28*Q, W,   .14],
+    // Chorus feel — "You are not alone"
+    [Bb4, 32*Q, H,   .16],
+    [G4,  34*Q, Q,   .13],
+    [F4,  35*Q, Q,   .12],
+    [Eb4, 36*Q, Q,   .11],
+    [D4,  37*Q, Q,   .11],
+    [C4,  38*Q, H,   .12],
+    [Bb3, 40*Q, H,   .13],
+    // High phrase
+    [Bb4, 42*Q, Q,   .15],
+    [C5,  43*Q, Q,   .15],
+    [D5,  44*Q, H,   .16],
+    [C5,  46*Q, Q,   .13],
+    [Bb4, 47*Q, Q,   .12],
+    [G4,  48*Q, Q,   .11],
+    [F4,  49*Q, Q,   .11],
+    [Eb4, 50*Q, H,   .12],
+    [D4,  52*Q, W,   .13],
+    // Final ascent
+    [F4,  56*Q, Q,   .11],
+    [G4,  57*Q, Q,   .12],
+    [Bb4, 58*Q, H,   .15],
+    [Ab4, 60*Q, Q,   .12],
+    [G4,  61*Q, Q,   .11],
+    [F4,  62*Q, Q,   .10],
+    [Eb4, 63*Q, Q,   .10],
+    [D4,  64*Q, H,   .12],
+    [Bb3, 66*Q, W*2, .13], // final long resolution
+  ];
+
+  mel.forEach(([f,t,d,a]) => lPianoNote(f, now+t, d, a));
+
+  // Chord pads underneath — Bb · F · Gm · Eb progression
+  const Bb2=116.54, F3=174.61, F2=87.31, Eb2=77.78, G2=98.00;
+  const prog = [
+    // [time, chordFreqs, duration, amp]
+    [0,    [Bb2,F3,Bb3,D4],   W, .018],
+    [W,    [Bb2,F3,Bb3,D4],   W, .018],
+    [W*2,  [F2, F3,C4, F4],   W, .018],
+    [W*3,  [F2, F3,C4, F4],   W, .018],
+    [W*4,  [G2, D4,G4, Bb4],  W, .018],
+    [W*5,  [G2, D4,G4, Bb4],  W, .018],
+    [W*6,  [Eb2,G2,Eb4,G4],   W, .018],
+    [W*7,  [Eb2,G2,Eb4,G4],   W, .018],
+    [W*8,  [Bb2,F3,Bb3,D4],   W, .018],
+    [W*9,  [Bb2,F3,Bb3,D4],   W, .018],
+    [W*10, [F2, F3,C4, F4],   W, .018],
+    [W*11, [F2, F3,C4, F4],   W, .018],
+    [W*12, [G2, D4,G4, Bb4],  W, .018],
+    [W*13, [G2, D4,G4, Bb4],  W, .018],
+    [W*14, [Eb2,G2,Eb4,G4],   W*2,.018],
+    [W*16, [Bb2,F3,Bb3,D4],   W*4,.015],
+  ];
+
+  prog.forEach(([t,freqs,d,a]) => freqs.forEach(f => lPad(f, now+t, d, a)));
 }
 </script>
 </body>
