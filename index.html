@@ -610,6 +610,76 @@
       text-shadow:0 0 28px rgba(255,255,255,.32), 0 0 56px var(--red-glow);
     }
 
+    /* ── Photo album ── */
+    #letter-album {
+      opacity:0; transform:translateY(30px);
+      transition:opacity 1.3s ease, transform 1.3s cubic-bezier(.25,.46,.45,.94);
+      width:100%; margin-bottom:clamp(30px,6vh,55px);
+    }
+    #letter-album.show { opacity:1; transform:translateY(0); }
+
+    .album-title {
+      font-family:'Dancing Script',cursive;
+      font-size:clamp(1.3rem,4vw,1.9rem);
+      color:var(--gold); opacity:.75;
+      margin-bottom:clamp(18px,3.5vh,32px);
+      letter-spacing:.5px;
+    }
+
+    .album-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:auto auto auto;
+      gap:10px;
+    }
+    /* first photo spans full width */
+    .album-grid .ap:first-child {
+      grid-column:1 / -1;
+    }
+    /* last photo (5th) also spans full width if odd */
+    .album-grid .ap:last-child:nth-child(odd) {
+      grid-column:1 / -1;
+    }
+
+    .ap {
+      position:relative; overflow:hidden; border-radius:16px;
+      background:#0e0608;
+      border:1px solid rgba(212,175,55,.18);
+      box-shadow:0 4px 24px rgba(0,0,0,.7);
+      aspect-ratio:4/5;
+      opacity:0;
+      animation:apIn 1s cubic-bezier(.25,.46,.45,.94) both;
+    }
+    /* first photo wider ratio */
+    .ap:first-child { aspect-ratio:16/10; }
+    /* last full-width photo */
+    .ap:last-child:nth-child(odd) { aspect-ratio:16/10; }
+
+    @keyframes apIn {
+      from { opacity:0; transform:scale(.94) translateY(18px); }
+      to   { opacity:1; transform:scale(1)   translateY(0); }
+    }
+
+    .ap img {
+      width:100%; height:100%; object-fit:cover;
+      display:block;
+      transition:transform .6s ease;
+    }
+    .ap:hover img { transform:scale(1.04); }
+
+    /* gold shimmer on hover */
+    .ap::after {
+      content:'';
+      position:absolute; inset:0; border-radius:16px;
+      border:2px solid transparent;
+      background:linear-gradient(135deg,rgba(212,175,55,.28),transparent 60%) border-box;
+      -webkit-mask:linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:destination-out;
+      mask-composite:exclude;
+      opacity:0; transition:opacity .4s ease;
+    }
+    .ap:hover::after { opacity:1; }
+
     /* Letter replay button */
     #letter-replay-wrap {
       opacity:0; transition:opacity 1.2s ease;
@@ -753,6 +823,18 @@
       <div class="lp-frame">
         <div class="lp-ring"></div>
         <div class="lp-inner">💕</div>
+      </div>
+    </div>
+
+    <!-- Photo album — 5 photos in a grid -->
+    <div id="letter-album">
+      <div class="album-title">Nos plus beaux souvenirs ❤️</div>
+      <div class="album-grid">
+        <div class="ap"><img src="photo1.jpg" alt="Nous"></div>
+        <div class="ap"><img src="photo2.jpg" alt="Nous"></div>
+        <div class="ap"><img src="photo3.jpg" alt="Nous"></div>
+        <div class="ap"><img src="photo4.jpg" alt="Nous"></div>
+        <div class="ap"><img src="photo5.jpg" alt="Nous"></div>
       </div>
     </div>
 
@@ -1265,6 +1347,7 @@ function restartGame() {
     document.getElementById('prog-fill').style.width = '0%';
     document.getElementById('letter-lines').innerHTML = '';
     document.getElementById('letter-photo-wrap').classList.remove('show');
+    document.getElementById('letter-album').classList.remove('show');
     document.getElementById('letter-finale').classList.remove('show');
     document.getElementById('letter-replay-wrap').classList.remove('show');
     showScreen('landing');
@@ -1334,22 +1417,35 @@ function showLetter() {
   /* ── Photo, finale, replay appear shortly after all blocks ── */
   // last block visible at ≈ 0.15 + 6*0.38 + 1.3 ≈ 3.7s
   const photoWrap = document.getElementById('letter-photo-wrap');
+  const album     = document.getElementById('letter-album');
   const finale    = document.getElementById('letter-finale');
   const replay    = document.getElementById('letter-replay-wrap');
   photoWrap.classList.remove('show');
+  album.classList.remove('show');
   finale.classList.remove('show');
   replay.classList.remove('show');
 
+  // Reset album photo animations so they replay
+  album.querySelectorAll('.ap').forEach((ap, i) => {
+    ap.style.animation = 'none';
+    void ap.offsetWidth;
+    ap.style.animation = '';
+    ap.style.animationDelay = `${i * 0.18}s`;
+  });
+
   lT(() => photoWrap.classList.add('show'), 4000);
+
+  // Album slides in after the portrait photo
+  lT(() => album.classList.add('show'), 5200);
 
   lT(() => {
     finale.classList.add('show');
     // Burst of hearts for the finale
     for (let i = 0; i < 40; i++) lT(spawnLetterHeart, Math.random() * 3500);
     launchConfetti();
-  }, 5400);
+  }, 7000);
 
-  lT(() => replay.classList.add('show'), 7200);
+  lT(() => replay.classList.add('show'), 8800);
 
   /* ── Continuous soft heart rain throughout the letter ── */
   // Initial burst
