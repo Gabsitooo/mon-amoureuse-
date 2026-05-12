@@ -626,6 +626,9 @@
 <canvas id="bg"></canvas>
 <div class="ambient"></div>
 
+<!-- Background music (autoplay on first interaction) -->
+<audio id="bg-audio" src="music.mp3" loop preload="auto"></audio>
+
 <!-- Music toggle -->
 <button id="music-btn" onclick="toggleMusic()" title="Musique">♪</button>
 
@@ -824,7 +827,8 @@ const BAD_MSGS = [
 ═══════════════════════════════════════════════════════════ */
 let cQ = 0, score = 0, answered = false;
 let musicOn = false, audioCtx = null;
-let bgMasterGain = null, bgNodes = [];
+const bgAudio = document.getElementById('bg-audio');
+bgAudio.volume = 0.55;
 
 /* ═══════════════════════════════════════════════════════════
    CANVAS — FLOATING HEARTS
@@ -873,7 +877,7 @@ function drawCvs() {
 drawCvs();
 
 /* ═══════════════════════════════════════════════════════════
-   AUDIO — single piano music system for the entire game
+   AUDIO — MP3 background + Web Audio for SFX
 ═══════════════════════════════════════════════════════════ */
 function initAudio() {
   if (!audioCtx) audioCtx = new (AudioContext || webkitAudioContext)();
@@ -893,132 +897,36 @@ function updateMusicBtn() {
   }
 }
 
-function toggleMusic() {
-  initAudio();
-  musicOn = !musicOn;
-  if (musicOn) {
-    if (!bgMasterGain) startBgMusic(); // start if not yet running
-    else bgMasterGain.gain.linearRampToValueAtTime(.058, audioCtx.currentTime + .8);
-  } else {
-    if (bgMasterGain) bgMasterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + .8);
-  }
-  updateMusicBtn();
-}
-
 function startBgMusic() {
-  // Stop any previous instance cleanly
-  const oldGain  = bgMasterGain;
-  const oldNodes = bgNodes.slice();
-  bgMasterGain = null; bgNodes = [];
-  if (oldGain && audioCtx) {
-    try { oldGain.gain.setValueAtTime(0, audioCtx.currentTime); } catch(e) {}
-    setTimeout(() => {
-      oldNodes.forEach(n => { try{n.stop&&n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
-      try{oldGain.disconnect();}catch(e){}
-    }, 200);
-  }
-
-  const mg = audioCtx.createGain();
-  mg.gain.setValueAtTime(0, audioCtx.currentTime);
-  mg.gain.linearRampToValueAtTime(.058, audioCtx.currentTime + 4);
-  mg.connect(audioCtx.destination);
-  bgMasterGain = mg;
-
-  scheduleBgMelody(mg);
-}
-
-function stopBgMusic() {
-  const oldGain  = bgMasterGain;
-  const oldNodes = bgNodes.slice();
-  bgMasterGain = null; bgNodes = [];
-  musicOn = false;
+  bgAudio.currentTime = 0;
+  bgAudio.volume = 0;
+  const p = bgAudio.play();
+  if (p) p.catch(() => {}); // suppress uncaught promise on some browsers
+  // Fade in volume over 3s
+  let vol = 0;
+  const fi = setInterval(() => {
+    vol = Math.min(.58, vol + .02);
+    bgAudio.volume = vol;
+    if (vol >= .58) clearInterval(fi);
+  }, 100);
+  musicOn = true;
   updateMusicBtn();
-  if (oldGain && audioCtx) {
-    try { oldGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1); } catch(e) {}
-    setTimeout(() => {
-      oldNodes.forEach(n => { try{n.stop&&n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
-      try{oldGain.disconnect();}catch(e){}
-    }, 1500);
+}
+
+function toggleMusic() {
+  if (musicOn) {
+    musicOn = false;
+    bgAudio.pause();
+  } else {
+    musicOn = true;
+    bgAudio.play().catch(() => {});
   }
+  updateMusicBtn();
 }
 
-/* Piano note — triangle fundamental + 2nd harmonic → warm piano timbre */
-function bgNote(freq, t, dur, amp, mg) {
-  [[freq,.55,'sine'],[freq*2,.25,'sine'],[freq*3,.08,'sine']].forEach(([f,rel,tp]) => {
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = tp; o.frequency.value = f;
-    o.connect(g); g.connect(mg);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(amp*rel, t+.014);
-    g.gain.exponentialRampToValueAtTime(amp*rel*.36, t+.10);
-    g.gain.exponentialRampToValueAtTime(amp*rel*.16, t+dur*.55);
-    g.gain.exponentialRampToValueAtTime(.0001, t+dur);
-    o.start(t); o.stop(t+dur+.08);
-    bgNodes.push(o, g);
-  });
-}
-
-/* Chord pad — sustained sine */
-function bgPad(freq, t, dur, amp, mg) {
-  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-  o.type = 'sine'; o.frequency.value = freq;
-  o.connect(g); g.connect(mg);
-  const r = Math.min(2.2, dur*.28);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(amp, t+r);
-  g.gain.linearRampToValueAtTime(amp, t+dur-r);
-  g.gain.linearRampToValueAtTime(0, t+dur);
-  o.start(t); o.stop(t+dur+.12);
-  bgNodes.push(o, g);
-}
-
-function scheduleBgMelody(mg) {
-  const now = audioCtx.currentTime;
-  const Q=1.0, H=2.0, W=4.0;
-  const LOOP = 70; // seconds per loop
-  const LOOPS = 6; // ~7 minutes total, enough for any playthrough
-
-  // "You Are Not Alone" inspired — Bb major, 60 BPM
-  const F4=349.23,Eb4=311.13,D4=293.66,Bb3=233.08,G4=392.00,Ab4=415.30,
-        Bb4=466.16,C5=523.25,D5=587.33,C4=261.63;
-
-  const mel = [
-    [F4,0,H,.13],[Eb4,2,Q,.11],[D4,3,Q,.11],[Bb3,4,H+Q,.14],
-    [F4,7,Q,.12],[G4,8,Q,.12],[F4,9,Q,.11],[Eb4,10,Q,.11],
-    [D4,11,H,.13],[C4,13,Q,.10],[Bb3,14,H,.12],
-    [D4,16,Q,.11],[Eb4,17,Q,.11],[F4,18,Q,.12],[G4,19,Q,.13],
-    [Bb4,20,H,.15],[Ab4,22,Q,.12],[G4,23,Q,.11],
-    [F4,24,Q,.11],[Eb4,25,Q,.11],[D4,26,Q,.10],[C4,27,Q,.10],[Bb3,28,W,.14],
-    [Bb4,32,H,.16],[G4,34,Q,.13],[F4,35,Q,.12],[Eb4,36,Q,.11],
-    [D4,37,Q,.11],[C4,38,H,.12],[Bb3,40,H,.13],
-    [Bb4,42,Q,.15],[C5,43,Q,.15],[D5,44,H,.16],[C5,46,Q,.13],
-    [Bb4,47,Q,.12],[G4,48,Q,.11],[F4,49,Q,.11],[Eb4,50,H,.12],[D4,52,W,.13],
-    [F4,56,Q,.11],[G4,57,Q,.12],[Bb4,58,H,.15],[Ab4,60,Q,.12],
-    [G4,61,Q,.11],[F4,62,Q,.10],[Eb4,63,Q,.10],[D4,64,H,.12],[Bb3,66,W*2,.13],
-  ];
-
-  const Bb2=116.54,F3=174.61,F2=87.31,Eb2=77.78,G2=98.00;
-  const prog = [
-    [0,[Bb2,F3,Bb3,D4],W,.013],[W,[Bb2,F3,Bb3,D4],W,.013],
-    [W*2,[F2,F3,C4,F4],W,.013],[W*3,[F2,F3,C4,F4],W,.013],
-    [W*4,[G2,D4,G4,Bb4],W,.013],[W*5,[G2,D4,G4,Bb4],W,.013],
-    [W*6,[Eb2,G2,Eb4,G4],W,.013],[W*7,[Eb2,G2,Eb4,G4],W,.013],
-    [W*8,[Bb2,F3,Bb3,D4],W,.013],[W*9,[Bb2,F3,Bb3,D4],W,.013],
-    [W*10,[F2,F3,C4,F4],W,.013],[W*11,[F2,F3,C4,F4],W,.013],
-    [W*12,[G2,D4,G4,Bb4],W,.013],[W*13,[G2,D4,G4,Bb4],W,.013],
-    [W*14,[Eb2,G2,Eb4,G4],W*2,.013],[W*16,[Bb2,F3,Bb3,D4],W*4,.011],
-  ];
-
-  for (let loop = 0; loop < LOOPS; loop++) {
-    const off = loop * LOOP;
-    mel.forEach(([f,t,d,a]) => bgNote(f, now+off+t*Q, d*Q, a, mg));
-    prog.forEach(([t,freqs,d,a]) => freqs.forEach(f => bgPad(f, now+off+t, d, a, mg)));
-  }
-}
-
-/* Alias used by old code paths */
-function startAmbient() { startBgMusic(); }
-function stopAmbient()  { /* music continues — no-op */ }
+/* no-op aliases kept for any remaining call sites */
+function startAmbient() {}
+function stopAmbient()  {}
 
 function playOK() {
   initAudio();
