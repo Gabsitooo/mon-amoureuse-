@@ -472,21 +472,19 @@
     #letter-screen {
       background:#020202;
       flex-direction:column;
-      justify-content:flex-start;   /* prevent flex-center overflow clipping */
+      justify-content:flex-start;
       overflow-y:auto; align-items:flex-start;
       transition:opacity 2s cubic-bezier(.4,0,.2,1);
       padding:0;
-      /* Vignette via background so it scrolls correctly */
       background-image:
-        radial-gradient(ellipse 80% 60% at 50% 40%, transparent 20%, rgba(0,0,0,.7) 100%),
-        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(196,25,59,.04) 0%, transparent 65%);
+        radial-gradient(ellipse 80% 60% at 50% 40%, transparent 20%, rgba(0,0,0,.75) 100%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(196,25,59,.05) 0%, transparent 65%);
       background-attachment:fixed;
     }
 
-    /* Pulsing warm glow — overlay fixed outside scroll, shown with JS */
     #letter-glow-fixed {
       position:fixed; inset:0; z-index:11; pointer-events:none;
-      background:radial-gradient(ellipse 50% 55% at 50% 50%, rgba(196,25,59,.05) 0%, transparent 65%);
+      background:radial-gradient(ellipse 55% 60% at 50% 50%, rgba(196,25,59,.07) 0%, transparent 65%);
       animation:lgPulse 5s ease-in-out infinite;
       opacity:0; transition:opacity 1s ease;
     }
@@ -500,55 +498,71 @@
       text-align:center;
     }
 
+    /* blocks appear via CSS animation — no JS class toggle needed */
     .letter-block {
-      width:100%; opacity:0; transform:translateY(18px);
-      transition:opacity 2s ease, transform 2s ease;
+      width:100%;
       margin-bottom:clamp(22px,4.5vh,44px);
+      opacity:0;
+      animation:letterBlockIn 1.3s cubic-bezier(.25,.46,.45,.94) both;
     }
-    .letter-block.show { opacity:1; transform:translateY(0); }
+    @keyframes letterBlockIn {
+      from { opacity:0; transform:translateY(38px) scale(.98); }
+      to   { opacity:1; transform:translateY(0)    scale(1); }
+    }
 
     .lb-title {
       font-family:'Dancing Script',cursive;
       font-size:clamp(2.2rem,6vw,3.4rem);
       color:var(--gold);
-      text-shadow:0 0 32px var(--gold-glow), 0 0 64px rgba(212,175,55,.18);
+      text-shadow:0 0 40px var(--gold-glow), 0 0 80px rgba(212,175,55,.2);
       line-height:1.35;
     }
 
     .lb-para {
       font-family:'Playfair Display',serif;
       font-size:clamp(.95rem,2.4vw,1.22rem);
-      font-style:italic; line-height:2.05;
-      color:rgba(242,237,230,.82);
+      font-style:italic; line-height:2.1;
+      color:rgba(242,237,230,.85);
     }
 
     .lb-love {
       font-family:'Playfair Display',serif;
       font-size:clamp(2rem,5vw,3rem);
       font-style:italic; color:var(--red);
-      text-shadow:0 0 32px var(--red-glow), 0 0 64px rgba(196,25,59,.2);
+      text-shadow:0 0 36px var(--red-glow), 0 0 72px rgba(196,25,59,.22);
     }
 
     .lb-sig {
       font-family:'Dancing Script',cursive;
       font-size:clamp(2rem,5.5vw,3rem);
       color:var(--gold);
-      text-shadow:0 0 24px var(--gold-glow);
+      text-shadow:0 0 28px var(--gold-glow);
       line-height:1.45;
     }
 
     .lb-sep {
-      width:38px; height:1px;
+      width:80px; height:1px;
       background:linear-gradient(90deg,transparent,var(--gold),transparent);
-      margin:0 auto clamp(20px,4.5vh,44px); opacity:0;
-      transition:opacity 2s ease;
+      margin:0 auto clamp(20px,4.5vh,44px);
+      opacity:0;
+      animation:sepReveal 1.2s ease both;
     }
-    .lb-sep.show { opacity:.38; }
+    @keyframes sepReveal { to { opacity:.42; } }
+
+    /* decorative hearts flanking separators */
+    .lb-sep-hearts {
+      display:flex; align-items:center; justify-content:center; gap:14px;
+      margin:-clamp(16px,3.5vh,34px) auto clamp(20px,4.5vh,44px);
+      opacity:0;
+      animation:sepReveal 1.4s ease both;
+      font-size:13px; color:var(--red);
+    }
+    .lb-sep-hearts span { opacity:.55; }
 
     /* Photo block */
     #letter-photo-wrap {
-      opacity:0; transform:scale(.92);
-      transition:opacity 2.2s ease, transform 2.2s ease;
+      opacity:0; transform:scale(.9);
+      transition:opacity 1.1s ease, transform 1.1s cubic-bezier(.34,1.2,.64,1);
       display:flex; flex-direction:column; align-items:center; gap:22px;
       margin-bottom:clamp(22px,4vh,40px);
     }
@@ -571,7 +585,7 @@
     }
     @keyframes lrGlow {
       0%,100%{ box-shadow:0 0 44px var(--gold-glow), 0 0 88px rgba(212,175,55,.18); }
-      50%{ box-shadow:0 0 70px rgba(212,175,55,.65), 0 0 130px rgba(212,175,55,.28); }
+      50%{ box-shadow:0 0 75px rgba(212,175,55,.7), 0 0 140px rgba(212,175,55,.3); }
     }
     .lp-inner {
       width:190px; height:190px; border-radius:50%; overflow:hidden;
@@ -584,24 +598,36 @@
 
     /* "Pour toujours" finale */
     #letter-finale {
-      opacity:0; transform:translateY(14px) scale(.97);
-      transition:opacity 2.8s ease, transform 2.8s ease;
+      opacity:0; transform:translateY(14px) scale(.96);
+      transition:opacity 1.5s ease, transform 1.5s cubic-bezier(.34,1.2,.64,1);
       margin-bottom:clamp(30px,6vh,60px);
     }
     #letter-finale.show { opacity:1; transform:translateY(0) scale(1); }
     .lf-text {
       font-family:'Dancing Script',cursive;
-      font-size:clamp(1.9rem,5.5vw,3rem);
+      font-size:clamp(1.9rem,5.5vw,3.2rem);
       color:var(--white);
-      text-shadow:0 0 24px rgba(255,255,255,.28), 0 0 48px var(--red-glow);
+      text-shadow:0 0 28px rgba(255,255,255,.32), 0 0 56px var(--red-glow);
     }
 
     /* Letter replay button */
     #letter-replay-wrap {
-      opacity:0; transition:opacity 2s ease;
+      opacity:0; transition:opacity 1.2s ease;
       margin-bottom:20px;
     }
     #letter-replay-wrap.show { opacity:1; }
+
+    /* Floating letter heart particle */
+    .lhf {
+      position:fixed; pointer-events:none; z-index:13;
+      animation:lhfloat linear forwards;
+    }
+    @keyframes lhfloat {
+      0%   { transform:translateY(0)      rotate(-12deg) scale(1);   opacity:0; }
+      8%   { opacity:1; }
+      50%  { transform:translateY(-52vh)  rotate(10deg)  scale(.85); }
+      100% { transform:translateY(-110vh) rotate(-18deg) scale(.3);  opacity:0; }
+    }
 
     /* Letter mute button — fixed bottom-right */
     #letter-mute {
@@ -731,10 +757,11 @@
     </div>
 
     <div id="letter-finale">
-      <div class="lf-text">Pour toujours, toi et moi ❤️</div>
+      <div class="lf-text">Pour toujours, toi et moi&nbsp;❤️</div>
     </div>
 
-    <div id="letter-replay-wrap">
+    <div id="letter-replay-wrap" style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <div style="font-family:'Dancing Script',cursive;font-size:1.1rem;color:rgba(212,175,55,.5);letter-spacing:1px;">— Gabriel &amp; Amandine —</div>
       <button class="btn" onclick="restartGame()" style="font-size:.78rem;background:linear-gradient(135deg,#6a0a1a,#3a0610);border-color:rgba(212,175,55,.45);">↩ &nbsp; Rejouer</button>
     </div>
   </div>
@@ -1233,7 +1260,7 @@ function restartGame() {
   const src = document.querySelector('.screen.active');
   const sid = src ? src.id : 'result-screen';
   hideScreen(sid, () => {
-    document.querySelectorAll('.hf,.hb,.conf').forEach(e => e.remove());
+    document.querySelectorAll('.hf,.hb,.conf,.lhf').forEach(e => e.remove());
     cQ = 0; score = 0;
     document.getElementById('prog-fill').style.width = '0%';
     document.getElementById('letter-lines').innerHTML = '';
@@ -1247,18 +1274,10 @@ function restartGame() {
 /* ═══════════════════════════════════════════════════════════
    LETTER SCREEN
 ═══════════════════════════════════════════════════════════ */
-let letterMuted = false;
 let letterHeartsIv = null, letterTIDs = [];
 
-// Track timeouts so they can all be cancelled on restart
 function lT(fn, ms) { const id = setTimeout(fn, ms); letterTIDs.push(id); return id; }
 function clearLetterTIDs() { letterTIDs.forEach(clearTimeout); letterTIDs = []; }
-
-// Scroll the letter container smoothly to show new content
-function letterScroll() {
-  const ls = document.getElementById('letter-screen');
-  ls.scrollTo({ top: ls.scrollHeight, behavior: 'smooth' });
-}
 
 const LETTER_BLOCKS = [
   { type:'title', text:'Joyeux huit mois,\nmon amour.' },
@@ -1270,14 +1289,7 @@ const LETTER_BLOCKS = [
   { type:'sig',   text:'Ton amoureux,\nGabriel ❤️' },
 ];
 
-// Cumulative show time in ms for each block
-const BDEL = [1600, 5800, 10800, 17200, 24000, 31000, 35500];
-const PHOTO_DEL  = 40000;
-const FINALE_DEL = 45500;
-const REPLAY_DEL = 50000;
-
 function showLetter() {
-  // Music keeps playing — no stop/restart
   document.querySelectorAll('.hf,.conf').forEach(e => e.remove());
   clearLetterTIDs();
   clearInterval(letterHeartsIv);
@@ -1286,23 +1298,22 @@ function showLetter() {
   ls.scrollTop = 0;
 
   showScreen('letter-screen');
-
-  // Show glow overlay
   document.getElementById('letter-glow-fixed').classList.add('on');
 
   const muteBtn = document.getElementById('letter-mute');
   muteBtn.classList.add('visible');
   muteBtn.textContent = '🔊';
   muteBtn.style.color = '';
-  letterMuted = false;
 
-  // Build blocks fresh
+  /* ── Build all letter blocks immediately with staggered CSS animation ── */
   const container = document.getElementById('letter-lines');
   container.innerHTML = '';
 
   LETTER_BLOCKS.forEach((block, i) => {
     const el = document.createElement('div');
     el.className = 'letter-block';
+    // Each block staggers 0.38s after the previous
+    el.style.animationDelay = `${0.15 + i * 0.38}s`;
     const inner = block.text.replace(/\n/g, '<br>');
     if      (block.type === 'title') el.innerHTML = `<div class="lb-title">${inner}</div>`;
     else if (block.type === 'para')  el.innerHTML = `<div class="lb-para">${inner}</div>`;
@@ -1310,20 +1321,18 @@ function showLetter() {
     else                             el.innerHTML = `<div class="lb-sig">${inner}</div>`;
     container.appendChild(el);
 
-    // Separator after each block except the last two
+    // Ornamental separator + hearts between blocks (not after last two)
     if (i < LETTER_BLOCKS.length - 2) {
-      const sep = document.createElement('div');
-      sep.className = 'lb-sep';
-      container.appendChild(sep);
-      lT(() => sep.classList.add('show'), BDEL[i] + 700);
+      const row = document.createElement('div');
+      row.className = 'lb-sep-hearts';
+      row.style.animationDelay = `${0.15 + i * 0.38 + 0.9}s`;
+      row.innerHTML = '<span>♥</span><div class="lb-sep" style="flex:1;margin:0;animation-delay:inherit"></div><span>♥</span>';
+      container.appendChild(row);
     }
-
-    lT(() => {
-      el.classList.add('show');
-      lT(letterScroll, 250);
-    }, BDEL[i]);
   });
 
+  /* ── Photo, finale, replay appear shortly after all blocks ── */
+  // last block visible at ≈ 0.15 + 6*0.38 + 1.3 ≈ 3.7s
   const photoWrap = document.getElementById('letter-photo-wrap');
   const finale    = document.getElementById('letter-finale');
   const replay    = document.getElementById('letter-replay-wrap');
@@ -1331,31 +1340,51 @@ function showLetter() {
   finale.classList.remove('show');
   replay.classList.remove('show');
 
-  lT(() => {
-    photoWrap.classList.add('show');
-    lT(letterScroll, 250);
-    for (let i = 0; i < 18; i++) lT(spawnHF, Math.random() * 2500);
-  }, PHOTO_DEL);
+  lT(() => photoWrap.classList.add('show'), 4000);
 
   lT(() => {
     finale.classList.add('show');
-    lT(letterScroll, 250);
-    for (let i = 0; i < 32; i++) lT(spawnHF, Math.random() * 4000);
-  }, FINALE_DEL);
+    // Burst of hearts for the finale
+    for (let i = 0; i < 40; i++) lT(spawnLetterHeart, Math.random() * 3500);
+    launchConfetti();
+  }, 5400);
 
-  lT(() => replay.classList.add('show'), REPLAY_DEL);
+  lT(() => replay.classList.add('show'), 7200);
 
-  // Slow continuous hearts
+  /* ── Continuous soft heart rain throughout the letter ── */
+  // Initial burst
+  for (let i = 0; i < 16; i++) lT(spawnLetterHeart, 400 + Math.random() * 3000);
+
   let hCount = 0;
   letterHeartsIv = setInterval(() => {
-    if (hCount > 300) { clearInterval(letterHeartsIv); return; }
-    spawnHF(); hCount++;
-  }, 750);
+    if (hCount > 500) { clearInterval(letterHeartsIv); return; }
+    spawnLetterHeart(); hCount++;
+  }, 480);
 }
 
-/* Letter mute button — toggles the global music */
+/* Dedicated romantic heart particle for the letter screen */
+function spawnLetterHeart() {
+  const emojis = ['❤️','💕','💖','💗','💝','✨','🌹','💫','❣️','💞','🫶'];
+  const el = document.createElement('div');
+  el.className = 'lhf';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  const dur   = 5 + Math.random() * 5;
+  const delay = Math.random() * 1.5;
+  const size  = 13 + Math.random() * 24;
+  el.style.cssText = `
+    left:${3 + Math.random() * 94}vw;
+    bottom:-70px;
+    font-size:${size}px;
+    animation-duration:${dur}s;
+    animation-delay:${delay}s;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), (dur + delay + 1) * 1000);
+}
+
+/* Letter mute button */
 function toggleLetterMusic() {
-  toggleMusic(); // reuses the global toggle
+  toggleMusic();
   const btn = document.getElementById('letter-mute');
   btn.textContent = musicOn ? '🔊' : '🔇';
   btn.style.color  = musicOn ? '' : 'rgba(255,255,255,.35)';
